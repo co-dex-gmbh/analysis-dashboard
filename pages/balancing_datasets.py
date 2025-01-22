@@ -1,41 +1,45 @@
 import dash
-from dash import dcc, callback
+from dash import dcc, callback, Input, Output, dash_table
 
 # import glob oder import os
 
 
 from dash import html
+import pandas as pd
+
+from utils.file_handlers import read_filenames
 
 dash.register_page(__name__)
 
+
 # Hier kommen die Dataset names rein 
-regression_dropdown = dcc.Dropdown(
-    id='regression-dropdown',
-    options=[
-        {'label': 'Support Vector Regression (SVR)', 'value': 'svr'},
-        {'label': 'Decision Tree Regression (DTR)', 'value': 'dtr'},
-        {'label': 'Linear Regression', 'value': 'linear'}
-    ],
+file_dropdown = dcc.Dropdown(
+    id='file-dropdown',
+    options= read_filenames("data"),
     value='linear'
 )
 
 # hier wird das Datasets angezeigt. 
 # Neben Dash Table gibt es auch andere tabellen, die möglich wären
-dataset = dash.dash_table(
-    
+dataset = dash_table.DataTable(
+    id="dataset-table"
 )
 
 
 layout = [
-    regression_dropdown
+    file_dropdown,
+    dataset
 ]
 
 
 # Das ist der Callback, um die Tabelle zu laden und zu aktualisieren
 @callback(
-    
+    Output("dataset-table", "data"),
+    Input("file-dropdown", "value"),
+    prevent_initial_call=True
 )
-def load_dataset (...):
+def load_dataset (filepath):
     # gib das dataset, das gerade geladen wurde als Tabelle zurück
-    return ...
+    df = pd.read_csv(filepath)
+    return df.to_dict(orient="records")
 
