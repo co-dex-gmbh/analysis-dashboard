@@ -2,7 +2,8 @@ from dash import Dash, page_registry, page_container
 import dash_bootstrap_components as dbc
 
 app = Dash(__name__, use_pages=True,
-           external_stylesheets=[dbc.themes.SANDSTONE])
+           external_stylesheets=[dbc.themes.SANDSTONE],
+           prevent_initial_callbacks=True)
 
 
 nav_links = [dbc.NavItem(
