@@ -1,5 +1,5 @@
 import dash
-from dash import dcc, callback, Input, Output, State, dash_table, html
+from dash import dcc, callback, Input, Output, State, dash_table, html, no_update
 
 # import glob oder import os
 
@@ -56,6 +56,8 @@ def update_table(data):
     prevent_initial_call='initial_duplicate'
 )
 def update_table_columns(data, selected_columns):
+    if not selected_columns:
+        return data
     df = pd.DataFrame(data)
     return df[selected_columns].to_dict(orient="records")
 
@@ -67,6 +69,8 @@ def update_table_columns(data, selected_columns):
 )
 def load_dataset (filepath):
     # gib das dataset, das gerade geladen wurde als Tabelle zurück
+    if not filepath:
+        return no_update
     df = pd.read_csv(filepath)
     return df.to_dict(orient="records"), df.columns
 
