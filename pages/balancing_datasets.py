@@ -1,5 +1,5 @@
 import dash
-from dash import dcc, callback, Input, Output, dash_table
+from dash import dcc, callback, Input, Output, dash_table, html
 
 # import glob oder import os
 
@@ -25,21 +25,39 @@ dataset = dash_table.DataTable(
     id="dataset-table"
 )
 
+column_selector = dcc.Dropdown(
+    id='column-selector',
+    multi=True,
+    # options=
+)
+
+dataframe_store = dcc.Store(id="dataset-store")
 
 layout = [
+    dataframe_store, 
     file_dropdown,
-    dataset
+    column_selector,
+    dataset,
 ]
 
 
-# Das ist der Callback, um die Tabelle zu laden und zu aktualisieren
 @callback(
     Output("dataset-table", "data"),
+    Input("dataset-store", "data"),
+    prevent_initial_call=True
+)
+def update_table(data):
+    return data
+
+# Das ist der Callback, um die Tabelle zu laden und zu aktualisieren
+@callback(
+    [Output("dataset-store", "data"),
+    Output("column-selector", "options")],
     Input("file-dropdown", "value"),
     prevent_initial_call=True
 )
 def load_dataset (filepath):
     # gib das dataset, das gerade geladen wurde als Tabelle zurück
     df = pd.read_csv(filepath)
-    return df.to_dict(orient="records")
+    return df.to_dict(orient="records"), df.columns
 
